@@ -3,9 +3,6 @@ let isNewNote = true;
 $(document).on("click", "#delete-comment", function () {
     var thisNote = $(this).attr("data-id");
     console.log("thisNote", thisNote);
-    // $.remove("/note/:thisNote").then(function (data) {
-    //     location.reload();
-    // });
     $.ajax({
         method: "DELETE",
         url: "note/" + thisNote,
@@ -100,38 +97,6 @@ $(document).on("click", "#savenote", function () {
     $("#bodyinput").val("");
     location.reload();
 });
-
-
-
-
-// $(document).on("click", "#newnote", function () {
-//     // Grab the id associated with the article from the submit button
-//     var thisId = $(this).attr("data-id");
-//     console.log("newnote", thisId);
-
-//     // Run a POST request to change the note, using what's entered in the inputs
-//     $.ajax({
-//         method: "POST",
-//         url: "/articles/" + thisId,
-//         data: {
-//             // Value taken from title input
-//             title: $("#titleinput").val(),
-//             // Value taken from note textarea
-//             body: $("#bodyinput").val()
-//         }
-//     })
-//         // With that done
-//         .then(function (data) {
-//             // Log the response
-//             console.log(data);
-//             location.reload();
-//         });
-
-//     // Also, remove the values entered in the input and textarea for note entry
-//     $("#titleinput").val("");
-//     $("#bodyinput").val("");
-
-// });
 
 
 var handleScrape = () => {

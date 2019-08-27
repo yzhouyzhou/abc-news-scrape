@@ -32,12 +32,13 @@ module.exports = function (app) {
 
     app.get("/scrape", function (req, res) {
         let count = 0;
-        axios.get("https://abcnews.go.com").then(function (response) {
+        axios.get("https://abcnews.go.com/US").then(function (response) {
             // Then, we load that into cheerio and save it to $ for a shorthand selector
             // console.log(response.data);
             var $ = cheerio.load(response.data);
 
             // Now, we grab every h2 within an article tag, and do the following:
+            // $("li.headlines-li").each(function (i, element) {
             $("h1").each(function (i, element) {
                 // Save an empty result object
                 var result = {};
@@ -49,9 +50,13 @@ module.exports = function (app) {
                 result.link = $(this)
                     .children("a")
                     .attr("href");
+                result.summary = $(this)
+                    .find("div.desc")
+                    .text();               
 
                 if ((result.title.trim().length > 25) &&
                     (result.link.indexOf("abcnews") !== -1) &&
+                    (result.summary.trim().length > 25) &&
                     count < 20) {
                     // Create a new Article using the `result` object built from scraping
                     db.Article.create(result)
@@ -134,23 +139,7 @@ module.exports = function (app) {
         ).then(dbNote => {
             res.json(dbNote);
         });
-        // db.Note.create(req.body)
-        //     .then(function (dbNote) {
-        //         // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
-        //         // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
-        //         // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-        //         return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
-        //     })
-        //     .then(function (dbArticle) {
-        //         // If we were able to successfully update an Article, send it back to the client
-        //         res.json(dbArticle);
-        //     })
-        //     .catch(function (err) {
-        //         // If an error occurred, send it to the client
-        //         res.json(err);
-        //     });
     });
-
 
     app.delete("/note/:noteid", function (req, res) {
         console.log("hey, here", req.params.noteid);
