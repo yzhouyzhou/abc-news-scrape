@@ -2,12 +2,12 @@ var axios = require("axios");
 var cheerio = require("cheerio");
 var db = require("../models");
 
-module.exports = function (app) {
-    app.get("/", function (req, res) {
+module.exports = app => {
+    app.get("/", (req, res) => {
         db.Article.find({}).sort({ _id: -1 })
             .populate("note")
             .then(dbArticles => {
-                console.log(dbArticles);
+                // console.log(dbArticles);
                 res.render("index", { dbArticles });
             })
             .catch(err => {
@@ -15,31 +15,32 @@ module.exports = function (app) {
             });
     });
 
-    app.get("/clear", function (req, res) {
+    app.get("/clear", (req, res) => {
         // Grab every document in the Articles collection
         db.Note.deleteMany({})
-            .catch(function (err) {
+            .catch(err => {
                 // If an error occurred, send it to the client
                 console.log(err);
             });
         db.Article.deleteMany({})
-            .catch(function (err) {
+            .catch(err => {
                 // If an error occurred, send it to the client
                 console.log(err);
             });
+        console.log("All articles with notes are cleared");
         res.send("All articles with notes are cleared");
     });
 
-    app.get("/scrape", function (req, res) {
+    app.get("/scrape", (req, res) => {
         let count = 0;
-        axios.get("https://abcnews.go.com/US").then(function (response) {
+        axios.get("https://abcnews.go.com/US").then(response => {
             // Then, we load that into cheerio and save it to $ for a shorthand selector
             // console.log(response.data);
             var $ = cheerio.load(response.data);
 
             // Now, we grab every h2 within an article tag, and do the following:
             // $("li.headlines-li").each(function (i, element) {
-            $("h1").each(function (i, element) {
+            $("h1").each(function(i, element){
                 // Save an empty result object
                 var result = {};
 
@@ -52,7 +53,8 @@ module.exports = function (app) {
                     .attr("href");
                 result.summary = $(this)
                     .find("div.desc")
-                    .text();               
+                    .text();
+                // console.log(result);
 
                 if ((result.title.trim().length > 25) &&
                     (result.link.indexOf("abcnews") !== -1) &&
@@ -71,6 +73,7 @@ module.exports = function (app) {
                     count++;
                 }
             });
+            console.log( count + " News scrapted complete");
 
             // Send a message to the client
             res.send(count + " News Scraped Complete");
@@ -78,14 +81,14 @@ module.exports = function (app) {
     });
 
     // Route for getting all Articles from the db
-    app.get("/articles", function (req, res) {
+    app.get("/articles", (req, res) => {
         // Grab every document in the Articles collection
         db.Article.find({}).sort({ _id: -1 })
-            .then(function (dbArticle) {
+            .then(dbArticle => {
                 // If we were able to successfully find Articles, send them back to the client
                 res.json(dbArticle);
             })
-            .catch(function (err) {
+            .catch(err => {
                 // If an error occurred, send it to the client
                 res.json(err);
             });
@@ -93,43 +96,44 @@ module.exports = function (app) {
 
 
     // Route for grabbing a specific Article by id, populate it with it's note
-    app.get("/articles/:id", function (req, res) {
+    app.get("/articles/:id", (req, res) => {
         // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
         db.Article.findOne({ _id: req.params.id })
             // ..and populate all of the notes associated with it
             .populate("note")
-            .then(function (dbArticle) {
+            .then( dbArticle => {
                 // If we were able to successfully find an Article with the given id, send it back to the client
                 res.json(dbArticle);
             })
-            .catch(function (err) {
+            .catch(err => {
                 // If an error occurred, send it to the client
                 res.json(err);
             });
     });
 
     // Route for creating an Article's associated Note
-    app.post("/articles/:id", function (req, res) {
+    app.post("/articles/:id", (req, res) => {
         // Create a new note and pass the req.body to the entry
+        console.log("creating a new note");
         db.Note.create(req.body)
-            .then(function (dbNote) {
+            .then(dbNote => {
                 // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
                 // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
                 // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
                 return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
             })
-            .then(function (dbArticle) {
+            .then(dbArticle => {
                 // If we were able to successfully update an Article, send it back to the client
                 res.json(dbArticle);
             })
-            .catch(function (err) {
+            .catch(err => {
                 // If an error occurred, send it to the client
                 res.json(err);
             });
     });
 
     // Route for updating an Article's associated Note
-    app.put("/note/:noteid", function (req, res) {
+    app.put("/note/:noteid", (req, res) => {
         // Create a new note and pass the req.body to the entry
         db.Note.findOneAndUpdate({ _id: req.params.noteid },
             {
@@ -141,14 +145,14 @@ module.exports = function (app) {
         });
     });
 
-    app.delete("/note/:noteid", function (req, res) {
+    app.delete("/note/:noteid", (req, res) => {
         console.log("hey, here", req.params.noteid);
         db.Note.deleteOne({ _id: req.params.noteid }).then(dbNote => {
             console.log("Note is deleted now checking its Article...");
-            db.Article.findOne({ note: req.params.noteid }, function (err, dbArticle) {
+            db.Article.findOne({ note: req.params.noteid }, (err, dbArticle) => {
                 if (dbArticle != null) {
                     db.Article.update({ note: req.params.noteid },
-                        { $unset: { note: "" } }, function (err, newdbArticle) {
+                        { $unset: { note: "" } }, (err, newdbArticle) => {
                             console.log("Unset note property from article property ok ", newdbArticle); //output all props
                         }
                     )

@@ -2,7 +2,7 @@
     <div class="text-center mb-3">
         <button class="btn btn-lg btn-primary" id="clear">Clear</button>
         <button class="btn btn-lg btn-primary" id="scrape">Scrape</button>
-        <h1>ABC News Scraper</h1>
+        <h1>ABC News US Scraper</h1>
     </div>
     {{#each dbArticles}}
     <div class="card mt-1 mb-2">
@@ -10,13 +10,14 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-9">
-                        <a href={{link}} target="_blank" class="card-title"><h4><strong>{{title}}</strong></h4></a><br>
-                        <h4>{{summary}}</h4>
+                        <a href={{link}} target="_blank"
+                            class="card-title text-black"><strong>{{title}}</strong></a><br>
+                        {{summary}}
                         <hr>
                     </div>
 
                     <div class="col-3">
-                        <button class="btn btn-lg btn-primary" data-id={{_id}} id="add-comment">Comment</button>
+                        <button class="btn btn-lg btn-primary" data-id={{_id}} id="add-comment">Comments</button>
                     </div>
                     <!-- The Modal -->
                     <div class="modal" id="myModal" tabindex="-1" role="dialog">
@@ -43,10 +44,10 @@
                     {{#if note}}
                     <div class="col-2"></div>
                     <div class="col-4">
-                        {{note.title}}:{{note.body}}
+                        [[{{note.title}}]]&nbsp;&nbsp;{{note.body}}
                     </div>
                     <div class="col-2">
-                        <button class="btn btn-lg btn-primary" data-id={{note._id}} id="delete-comment">X</button>
+                        <button class="btn btn-sm btn-primary" data-id={{note._id}} id="delete-comment">X</button>
                     </div>
                     {{/if}}
                 </div>
@@ -57,4 +58,4 @@
     {{/each}}
 </div>
 
-<script type="text/javascript" src="/assets/scrape.js"></script>
+<script type="text/javascript" src="/assets/js/scrape.js"></script>

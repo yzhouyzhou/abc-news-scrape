@@ -9,7 +9,7 @@ $(document).on("click", "#delete-comment", function () {
         data: {
             noteid: thisNote
         }
-    }).then(function (data) {
+    }).then(data => {
         location.reload();
     })
     location.reload();
@@ -24,7 +24,7 @@ $(document).on("click", "#add-comment", function () {
         url: "/articles/" + thisId
     })
         // With that done, add the note information to the page
-        .then(function (data) {
+        .then(data => {
             console.log(data);
             $('#myModal').modal("show");
 
@@ -36,16 +36,17 @@ $(document).on("click", "#add-comment", function () {
                 $("#bodyinput").val(data.note.body);
                 var btnUpdate = $("#savenote");
                 btnUpdate.attr("data-id", data.note._id);
+                // if it is an exist note, savenote is updating
                 isNewNote = false;
                 console.log("thisId for update note", data.note._id);
             }
             else {
+                // if it is a new note, savenote is creating
                 isNewNote = true;
                 var btnNew = $("#savenote");
                 btnNew.attr("data-id", data._id);
                 console.log("thisId for create new", data._id);
             }
-
         });
 });
 
@@ -67,7 +68,7 @@ $(document).on("click", "#savenote", function () {
             }
         })
             // With that done
-            .then(function (data) {
+            .then(data => {
                 // Log the response
                 console.log(data);
                 location.reload();
@@ -86,7 +87,7 @@ $(document).on("click", "#savenote", function () {
             }
         })
             // With that done
-            .then(function (data) {
+            .then(data => {
                 // Log the response
                 console.log(data);
                 location.reload();
@@ -98,14 +99,14 @@ $(document).on("click", "#savenote", function () {
     location.reload();
 });
 
-
 var handleScrape = () => {
-    $.get("/scrape").then(function (data) {
+    console.log("start scraping");
+    $.get("/scrape").then(data => {
         location.reload();
     });
 }
 var handleClear = () => {
-    $.get("/clear").then(function (data) {
+    $.get("/clear").then(data => {
         location.reload();
     });
     location.reload();
