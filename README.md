@@ -1,7 +1,7 @@
 # abc-news-scrape
 
 ## heroku live URL
-http://yzhou-abcnews-us-scrape-live.herokuapp.com/
+https://yzhou-abcnews-us-scrape-live.herokuapp.com/
 
 ## git repo
 https://github.com/yzhouyzhou/abc-news-scrape
